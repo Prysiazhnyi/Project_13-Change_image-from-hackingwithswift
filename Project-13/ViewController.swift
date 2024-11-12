@@ -14,6 +14,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
 
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var intensity: UISlider!
+    @IBOutlet var changeFilterButton: UIButton!
     
     var currentImage: UIImage!
     
@@ -41,6 +42,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
            ac.addAction(UIAlertAction(title: "CIVignette", style: .default, handler: setFilter))
            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
            present(ac, animated: true)
+        
     }
     
     @IBAction func save(_ sender: Any) {
@@ -56,7 +58,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBAction func intensityChanged(_ sender: Any) {
         applyProcessing()
-        title = "????"
     }
     
     @objc func importPicture() {
@@ -94,18 +95,24 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func setFilter(action: UIAlertAction) {
-        // make sure we have a valid image before continuing!
+        // Убеждаемся, что изображение выбрано
         guard currentImage != nil else { return }
 
-        // safely read the alert action's title
+        // Получаем название выбранного фильтра
         guard let actionTitle = action.title else { return }
 
+        // Устанавливаем фильтр
         currentFilter = CIFilter(name: actionTitle)
 
+        // Присваиваем изображение для фильтра
         let beginImage = CIImage(image: currentImage)
         currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
 
+        // Применяем обработку изображения
         applyProcessing()
+        
+        // Изменяем название кнопки `changeFilterButton`
+        changeFilterButton.setTitle(actionTitle, for: .normal)
     }
     
     @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
